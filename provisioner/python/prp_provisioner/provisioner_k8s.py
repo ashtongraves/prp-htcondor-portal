@@ -67,7 +67,14 @@ class ProvisionerK8SConfig:
          priority_class_cpu: string (Optional)
              priorityClassName to associate with GPU pod
          base_tolerations: list of strings (Optional)
-             Tolerations of the form NoSchedule/Exists to add to the container
+             Tolerations to add to the container.
+             - If an entry is just a key (e.g. "nautilus.io/reservation"), it
+               will generate a toleration with operator "Exists" and effect
+               "NoSchedule".
+             - If an entry is of the form "key=value" (e.g.
+               "nautilus.io/reservation=scinet"), it will generate a
+               toleration with operator "Equal", that value, and effect
+               "NoSchedule".
          base_pvc_volumes: list of strings (Optional)
              PersistentVolumeClaims to add to the container, vvalues is mountpoint
          additional_labels: dictionary of strings (Optional)
@@ -529,9 +536,25 @@ class ProvisionerK8S:
    def _augment_tolerations(self, t_list, attrs):
       """Add any additional dictionaries to the list (attrs is read-only)"""
       for t in self.base_tolerations:
-         t_list.append({'effect': 'NoSchedule',
-                        'key': t,
-                        'operator': 'Exists'})
+         # Support both key-only (Exists) and key=value (Equal) forms
+         if isinstance(t, str) and ('=' in t):
+            k, v = t.split('=', 1)
+            k = k.strip()
+            v = v.strip()
+            if k != "":
+               t_list.append({
+                  'effect': 'NoSchedule',
+                  'key': k,
+                  'operator': 'Equal',
+                  'value': v
+               })
+         else:
+            # Default behavior: tolerate any value for the key
+            key_str = t if not isinstance(t, dict) else t.get('key', '')
+            if key_str != "":
+               t_list.append({'effect': 'NoSchedule',
+                              'key': key_str,
+                              'operator': 'Exists'})
 
       return
 

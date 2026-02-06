@@ -1,15 +1,14 @@
-FROM centos:centos7
+FROM almalinux:8 
 
 # OSG RPMs
-RUN yum -y install https://repo.opensciencegrid.org/osg/3.6/osg-3.6-el7-release-latest.rpm && \
-    yum -y install epel-release \
-                   yum-plugin-priorities && \
-    yum -y install less which \
-                   redhat-lsb-core && \
-    yum -y install python3-pip git && \
-    yum -y install condor python3-condor && \
-    yum clean all
-
+RUN dnf -y install https://repo.opensciencegrid.org/osg/24-main/osg-24-main-el8-release-latest.rpm && \
+    dnf -y install epel-release dnf-plugins-core && \
+    (dnf config-manager --set-enabled crb || dnf config-manager --set-enabled powertools) && \
+    dnf -y install less which redhat-lsb-core && \
+    dnf -y install python3-pip git && \
+    dnf -y install boost-python3 && \
+    dnf -y install condor python3-condor && \
+    dnf clean all
 
 RUN pip3 install kubernetes
 

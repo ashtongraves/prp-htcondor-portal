@@ -107,4 +107,15 @@ roleRef:
   kind: Role
   name: prp-htcondor-provisioner-configmaps # this must match the name of the Role you wish to bind to
   apiGroup: rbac.authorization.k8s.io
-
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prp-htcondor-provisioner-nodes
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view-nodes
+subjects:
+- kind: ServiceAccount
+  name: prp-htcondor-provisioner

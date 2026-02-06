@@ -34,8 +34,8 @@ def main(log_fname, namespace):
    k8s_obj = provisioner_k8s.ProvisionerK8S(kconfig)
    k8s_obj.authenticate()
 
-   max_pods_per_cluster = int(lfconfig.get('max_pods_per_cluster','20'))
-   max_submit_pods_per_cluster = int(lfconfig.get('max_submit_pods_per_cluster','1000'))
+   max_pods_per_cluster = int(fconfig['DEFAULT'].get('max_pods_per_cluster','20'))
+   max_submit_pods_per_cluster = int(fconfig['DEFAULT'].get('max_submit_pods_per_cluster','1000'))
    sleep_time = int(fconfig['DEFAULT'].get('sleep_time','120'))
 
    el = event_loop.ProvisionerEventLoop(log_obj, schedd_obj, collector_obj, k8s_obj, max_pods_per_cluster, max_submit_pods_per_cluster)
@@ -51,4 +51,3 @@ def main(log_fname, namespace):
 if __name__ == "__main__":
    # execute only if run as a script
    main(sys.argv[1], sys.argv[2])
-
